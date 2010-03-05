@@ -2,7 +2,7 @@ class Uppercut
   class Agent < Base
     VALID_CALLBACKS = [:signon, :signoff, :subscribe, :unsubscribe, :subscription_approval,
                        :subscription_denial, :status_change, :status_message_change]
-
+                       
     class << self
       # Define a new command for the agent.
       # 
@@ -16,9 +16,9 @@ class Uppercut
       # any captures in the pattern Regexp. (Does not apply to String 
       # patterns).
       def command(pattern, &block)
-        @@patterns ||= []
+        @patterns ||= []
         g = gensym
-        @@patterns << [pattern, g]
+        commands << [pattern, g]
         define_method(g, &block)
       end
 
@@ -34,6 +34,10 @@ class Uppercut
       def on(type, &block)
         raise 'Not a valid callback' unless VALID_CALLBACKS.include?(type)
         define_method("__on_#{type.to_s}") { |conversation| block[conversation] }
+      end
+      
+      def commands
+        @commands ||= []
       end
 
       private
@@ -183,7 +187,7 @@ class Uppercut
       return block[msg.body] if block
 
       captures = nil
-      pair = @@patterns.detect { |pattern, method| captures = matches?(pattern, msg.body) }
+      pair = self.class.commands.detect { |pattern, method| captures = matches?(pattern, msg.body) }
       if pair
         pattern, method = pair
         send method, Conversation.new(msg.from, self), captures

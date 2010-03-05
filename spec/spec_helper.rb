@@ -46,6 +46,13 @@ class TestAgent < Uppercut::Agent
   end
 end
 
+class FrenchTestAgent < Uppercut::Agent
+  command 'salut' do |c, args|
+    c.instance_eval { @base.instance_eval { @called_salut = true } }
+    c.send 'called salut'
+  end
+end
+
 class TestNotifier < Uppercut::Notifier
   notifier :foo do |m, data|
     m.to = 'foo@bar.com'

@@ -275,4 +275,25 @@ describe Uppercut::Agent do
       @agent.instance_eval { @called_hi_regex }.should == true
     end
   end
+  
+  describe :command do
+    before do
+      @french_agent = FrenchTestAgent.new('test@foo.com', 'pw', :connect => false)
+    end
+    
+    it "should allow multiple agents with different commands" do
+      msg = Jabber::Message.new(nil)
+      msg.body = 'hi'
+      msg.from = Jabber::JID.fake_jid
+            
+      @french_agent.send(:dispatch, msg)
+      @french_agent.instance_eval { @called_hi }.should_not == true
+      @french_agent.instance_eval { @called_salut }.should_not == true
+      
+      msg.body = 'salut'
+      @french_agent.send(:dispatch, msg)
+      @french_agent.instance_eval { @called_hi }.should_not == true
+      @french_agent.instance_eval { @called_salut }.should == true
+    end
+  end
 end
