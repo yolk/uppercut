@@ -1,5 +1,5 @@
 class BasicNotifier < Uppercut::Notifier
-  notifier :basic do |n,data|
+  notifier :basic do |n, data|
     n.to 'tyler@codehallow.com'
     n.send 'Hey kid.'
   end
@@ -10,7 +10,7 @@ class BasicAgent < Uppercut::Agent
     m.send `date`
   end
   
-  command /^cat (.*)/ do |m,rest|
+  command /^cat (.*)/ do |m, rest|
     m.send File.read(rest)
   end
   

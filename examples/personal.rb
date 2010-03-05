@@ -13,12 +13,12 @@ class PersonalAgent < Uppercut::Agent
     FeedTools::Feed.open('feed://www.nytimes.com/services/xml/rss/nyt/HomePage.xml')
   end
 
-  command 'weather' do |c,args|
+  command 'weather' do |c, args|
     weather = get_weather
     c.send "#{weather.title}\n#{weather.condition.temp} degrees\n#{weather.condition.text}"
   end
 
-  command 'forecast' do |c,args|
+  command 'forecast' do |c, args|
     response = get_weather
     msg = "#{response.forecasts[0].day} - #{response.forecasts[0].text}. "
     msg << "High: #{response.forecasts[0].high} Low: #{response.forecasts[0].low}\n"
@@ -27,8 +27,8 @@ class PersonalAgent < Uppercut::Agent
     c.send msg
   end
 
-  command 'news' do |c,args|
-    msg = get_news.items[0,5].map { |item|
+  command 'news' do |c, args|
+    msg = get_news.items[0, 5].map { |item|
       "#{item.title}\n#{item.link}"
     }.join("\n\n")
     c.send msg
@@ -36,7 +36,7 @@ class PersonalAgent < Uppercut::Agent
 end
 
 if $0 == __FILE__
-  agent = PersonalAgent.new('name@domain.com/PersonalAgent','password')
+  agent = PersonalAgent.new('name@domain.com/PersonalAgent', 'password')
   agent.listen
   sleep
 end

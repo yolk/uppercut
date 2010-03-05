@@ -7,17 +7,17 @@ describe Uppercut::Notifier do
   
   describe :new do
     it "connects by default" do
-      notifier = Uppercut::Notifier.new('test@foo','pw')
+      notifier = Uppercut::Notifier.new('test@foo', 'pw')
       notifier.should be_connected
     end
 
     it "does not connect by default with :connect = false" do
-      notifier = Uppercut::Notifier.new('test@foo','pw', :connect => false)
+      notifier = Uppercut::Notifier.new('test@foo', 'pw', :connect => false)
       notifier.should_not be_connected
     end
     
     it "populates @pw and @user" do
-      notifier = Uppercut::Notifier.new('test@foo','pw')
+      notifier = Uppercut::Notifier.new('test@foo', 'pw')
       notifier.instance_eval { @pw }.should == 'pw'
       notifier.instance_eval { @user }.should == 'test@foo'
     end

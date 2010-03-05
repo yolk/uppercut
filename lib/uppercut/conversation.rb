@@ -2,7 +2,7 @@ class Uppercut
   class Conversation < Message
     attr_reader :to
 
-    def initialize(to,base) #:nodoc:
+    def initialize(to, base) #:nodoc:
       @to = to
       super base
     end
@@ -21,7 +21,7 @@ class Uppercut
     #       end
     #     end
     def wait_for(&block)
-      @base.redirect_from(@to.bare,&block)
+      @base.redirect_from(@to.bare, &block)
     end
 
   end

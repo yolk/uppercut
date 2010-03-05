@@ -3,20 +3,20 @@ class Uppercut
     class << self
       @@notifiers = []
       
-      def notifier(name,&block)
+      def notifier(name, &block)
         @@notifiers << name
         define_method(name, &block)
       end
     end
 
-    def notify(name,data=nil)
+    def notify(name, data=nil)
       return false unless connected?
       return nil unless @@notifiers.include?(name)
 
-      send(name,Message.new(self),data)
+      send(name, Message.new(self), data)
     end
 
-    def initialize(user,pw,options={})
+    def initialize(user, pw, options={})
       options = DEFAULT_OPTIONS.merge(options)
 
       initialize_queue options[:starling], options[:queue]
@@ -53,7 +53,7 @@ class Uppercut
 
     private
 
-    def initialize_queue(server,queue)
+    def initialize_queue(server, queue)
       return unless queue && server      
       require 'starling'
       @queue = queue

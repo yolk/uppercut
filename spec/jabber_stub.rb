@@ -36,7 +36,7 @@ class Jabber
     
     # TESTING HELPER METHODS
     
-    def receive_message(from,body,type=:chat)
+    def receive_message(from, body, type=:chat)
       msg = Message.new(nil)
       msg.type = type
       msg.body = body
@@ -48,7 +48,7 @@ class Jabber
   class Presence
     attr_accessor :from, :type, :show, :status
 
-    def initialize(a,b)
+    def initialize(a, b)
     end
   end
   
@@ -109,7 +109,7 @@ class Jabber
       new 'foo', 'bar.com', 'baz'
     end
 
-    def initialize(node,domain,res)
+    def initialize(node, domain, res)
       @node, @domain, @res = node, domain, res
     end
 

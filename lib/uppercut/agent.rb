@@ -15,10 +15,10 @@ class Uppercut
       # to the sender.  The rest of the arguments to the block correspond to
       # any captures in the pattern Regexp. (Does not apply to String 
       # patterns).
-      def command(pattern,&block)
+      def command(pattern, &block)
         @@patterns ||= []
         g = gensym
-        @@patterns << [pattern,g]
+        @@patterns << [pattern, g]
         define_method(g, &block)
       end
 
@@ -39,7 +39,7 @@ class Uppercut
       private
 
       def gensym
-        ('__uc' + (self.instance_methods.grep(/^__uc/).size).to_s.rjust(8,'0')).intern
+        ('__uc' + (self.instance_methods.grep(/^__uc/).size).to_s.rjust(8, '0')).intern
       end
     end
 
@@ -51,7 +51,7 @@ class Uppercut
     # simply the password for this account.  The final, and optional, argument
     # is a boolean which controls whether or not it will attempt to connect to
     # the server immediately.  Defaults to true.
-    def initialize(user,pw,options={})
+    def initialize(user, pw, options={})
       options = DEFAULT_OPTIONS.merge(options)
       
       @user = user
@@ -113,7 +113,7 @@ class Uppercut
             end
           end
         end
-        @roster.add_subscription_request_callback do |item,presence|
+        @roster.add_subscription_request_callback do |item, presence|
           # Callbacks:
           # someone tries to subscribe (presence.type == 'subscribe')
 
@@ -161,7 +161,7 @@ class Uppercut
       @listen_thread && @listen_thread.alive?
     end
     
-    def redirect_from(contact,&block)
+    def redirect_from(contact, &block)
       @redirects[contact] ||= []
       @redirects[contact].push block
     end
@@ -183,10 +183,10 @@ class Uppercut
       return block[msg.body] if block
 
       captures = nil
-      pair = @@patterns.detect { |pattern,method| captures = matches?(pattern,msg.body) }
+      pair = @@patterns.detect { |pattern, method| captures = matches?(pattern, msg.body) }
       if pair
-        pattern, method = pair if pair
-        send method, Conversation.new(msg.from,self), captures
+        pattern, method = pair
+        send method, Conversation.new(msg.from, self), captures
       end
     end
 
@@ -196,10 +196,10 @@ class Uppercut
     end
 
     def __ucDefault(msg)
-      Message.new(msg.from,self).send("I don't know what \"#{msg.body}\" means.")
+      Message.new(msg.from, self).send("I don't know what \"#{msg.body}\" means.")
     end
 
-    def matches?(pattern,msg)
+    def matches?(pattern, msg)
       captures = nil
       case pattern
       when String
@@ -216,7 +216,7 @@ class Uppercut
       
       jid = jid.to_s
       return true if @allowed_roster.include?(jid)
-      return true if @allowed_roster.include?(jid.sub(/\/[^\/]+$/,''))
+      return true if @allowed_roster.include?(jid.sub(/\/[^\/]+$/, ''))
     end
 
   end

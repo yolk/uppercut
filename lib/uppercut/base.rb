@@ -57,7 +57,7 @@ class Uppercut
     end
     
     def present!
-      send! Jabber::Presence.new(nil,"Available")
+      send! Jabber::Presence.new(nil, "Available")
     end
     
     # Taken directly from xmpp4r-simple (thanks Blaine!)

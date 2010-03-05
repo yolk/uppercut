@@ -7,34 +7,34 @@ describe Uppercut::Agent do
   
   describe :new do
     it "connects by default" do
-      agent = Uppercut::Agent.new('test@foo','pw')
+      agent = Uppercut::Agent.new('test@foo', 'pw')
       agent.should be_connected
     end
 
     it "does not connect by default with :connect = false" do
-      agent = Uppercut::Agent.new('test@foo','pw', :connect => false)
+      agent = Uppercut::Agent.new('test@foo', 'pw', :connect => false)
       agent.should_not be_connected
     end
     
     it "starts to listen with :listen = true" do
-      agent = Uppercut::Agent.new('test@foo','pw', :listen => true)
+      agent = Uppercut::Agent.new('test@foo', 'pw', :listen => true)
       agent.should be_listening
     end
 
     it "initializes @redirects with a blank hash" do
-      agent = Uppercut::Agent.new('test@foo','pw', :connect => false)
+      agent = Uppercut::Agent.new('test@foo', 'pw', :connect => false)
       agent.instance_eval { @redirects }.should == {}
     end
 
     it "populates @pw and @user" do
-      agent = Uppercut::Agent.new('test@foo','pw')
+      agent = Uppercut::Agent.new('test@foo', 'pw')
       agent.instance_eval { @pw }.should == 'pw'
       agent.instance_eval { @user }.should == 'test@foo'
     end
     
     it "populates @allowed_roster with :roster option" do
       jids = %w(bob@foo fred@foo)
-      agent = Uppercut::Agent.new('test@foo','pw', :roster => jids)
+      agent = Uppercut::Agent.new('test@foo', 'pw', :roster => jids)
       agent.instance_eval { @allowed_roster }.should == jids
     end
   end
@@ -122,15 +122,15 @@ describe Uppercut::Agent do
     it "calls dispatch when receving a message" do
       @agent.listen
       @agent.should_receive(:dispatch)
-      @agent.client.receive_message("foo@bar.com","test")
+      @agent.client.receive_message("foo@bar.com", "test")
     end
 
     describe 'presence callbacks' do
       it 'processes :signon presence callback' do
         @agent.listen
         @agent.should_receive :__on_signon
-        new_presence = Jabber::Presence.new(nil,nil)
-        old_presence = Jabber::Presence.new(nil,nil)
+        new_presence = Jabber::Presence.new(nil, nil)
+        old_presence = Jabber::Presence.new(nil, nil)
         old_presence.type = :unavailable
 
         @agent.roster.receive_presence(Jabber::Roster::Helper::RosterItem.new, old_presence, new_presence)
@@ -139,7 +139,7 @@ describe Uppercut::Agent do
       it 'processes :signoff presence callback' do
         @agent.listen
         @agent.should_receive :__on_signoff
-        presence = Jabber::Presence.new(nil,nil)
+        presence = Jabber::Presence.new(nil, nil)
         presence.type = :unavailable
 
         @agent.roster.receive_presence(Jabber::Roster::Helper::RosterItem.new, nil, presence)
@@ -149,8 +149,8 @@ describe Uppercut::Agent do
         @agent.listen
         @agent.should_receive :__on_status_change
 
-        old_presence = Jabber::Presence.new(nil,nil)
-        new_presence = Jabber::Presence.new(nil,nil)
+        old_presence = Jabber::Presence.new(nil, nil)
+        new_presence = Jabber::Presence.new(nil, nil)
         new_presence.show = :away
 
         @agent.roster.receive_presence(Jabber::Roster::Helper::RosterItem.new, old_presence, new_presence)
@@ -160,10 +160,10 @@ describe Uppercut::Agent do
         @agent.listen
         @agent.should_receive :__on_status_message_change
 
-        old_presence = Jabber::Presence.new(nil,nil)
+        old_presence = Jabber::Presence.new(nil, nil)
         old_presence.status = 'chicka chicka yeaaaaah'
 
-        new_presence = Jabber::Presence.new(nil,nil)
+        new_presence = Jabber::Presence.new(nil, nil)
         new_presence.status = 'thom yorke is the man'
 
         @agent.roster.receive_presence(Jabber::Roster::Helper::RosterItem.new, old_presence, new_presence)
@@ -175,7 +175,7 @@ describe Uppercut::Agent do
         @agent.roster.should_receive :add
         @agent.roster.should_receive :accept_subscription
 
-        presence = Jabber::Presence.new(nil,nil)
+        presence = Jabber::Presence.new(nil, nil)
         presence.type = :subscribe
 
         @agent.roster.receive_subscription_request(Jabber::Roster::Helper::RosterItem.new, presence)
@@ -185,7 +185,7 @@ describe Uppercut::Agent do
         @agent.listen
         @agent.should_receive :__on_subscription_approval
 
-        presence = Jabber::Presence.new(nil,nil)
+        presence = Jabber::Presence.new(nil, nil)
         presence.type = :subscribed
 
         @agent.roster.receive_subscription(Jabber::Roster::Helper::RosterItem.new, presence)
@@ -195,7 +195,7 @@ describe Uppercut::Agent do
         @agent.listen
         @agent.should_receive :__on_subscription_denial
 
-        presence = Jabber::Presence.new(nil,nil)
+        presence = Jabber::Presence.new(nil, nil)
         presence.type = :unsubscribed
 
         item = Jabber::Roster::Helper::RosterItem.new
@@ -208,7 +208,7 @@ describe Uppercut::Agent do
         @agent.listen
         @agent.should_receive :__on_unsubscribe
 
-        presence = Jabber::Presence.new(nil,nil)
+        presence = Jabber::Presence.new(nil, nil)
         presence.type = :unsubscribe
 
         @agent.roster.receive_subscription(Jabber::Roster::Helper::RosterItem.new, presence)
@@ -249,7 +249,7 @@ describe Uppercut::Agent do
       @agent.listen
       @agent.should_receive(:__on_subscribe)
 
-      presence = Jabber::Presence.new(nil,nil)
+      presence = Jabber::Presence.new(nil, nil)
       @agent.send(:dispatch_presence, :subscribe, presence)
     end
   end

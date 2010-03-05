@@ -17,7 +17,7 @@ You could put together a very simple agent as follows:
         m.send `date`
       end
   
-      command /^cat (.*)/ do |c,rest|
+      command /^cat (.*)/ do |c, rest|
         m.send File.read(rest)
       end
   
@@ -40,7 +40,7 @@ Then to actually put the Agent to work...
 
 <pre>
   <code>
-    BasicAgent.new('user@server/resource','password').listen
+    BasicAgent.new('user@server/resource', 'password').listen
   </code>
 </pre>
 
@@ -79,7 +79,7 @@ h2. Making a Notifier
 <pre>
   <code>
     class BasicNotifier < Uppercut::Notifier
-      notifier :error do |m,data|
+      notifier :error do |m, data|
         m.to 'tbmcmullen@gmail.com'
         m.send "Something in your app blew up: #{data}"
       end
@@ -91,7 +91,7 @@ So, we make a new Notifier class and call a _notifier_ block within it.  This ma
 
 <pre>
   <code>
-    notifier = BasicNotifier.new('user@server/resource','password').connect
+    notifier = BasicNotifier.new('user@server/resource', 'password').connect
     
     notifier.notify :error, 'Sprocket Error!'
   </code>
@@ -103,7 +103,7 @@ The way I intend a Notifier to be used though is with Starling.  Take the follow
 
 <pre>
   <code>
-    notifier = BasicNotifier.new('user@server','password', :starling => 'localhost:22122', :queue => 'basic')
+    notifier = BasicNotifier.new('user@server', 'password', :starling => 'localhost:22122', :queue => 'basic')
     notifier.listen
     sleep
   </code>
