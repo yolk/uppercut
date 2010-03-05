@@ -184,8 +184,9 @@ class Uppercut
       captures = nil
       pair = self.class.commands.detect { |pattern, block| captures = matches?(pattern, msg.body) }
       if pair
-        pattern, block = pair
-        block.call(Conversation.new(msg.from, self), captures)
+        block = pair[1]
+        arguments = [ Conversation.new(msg.from, self), *captures ][0..block.arity-1]
+        block.call(*arguments)
       end
     end
 

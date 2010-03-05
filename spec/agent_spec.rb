@@ -274,6 +274,15 @@ describe Uppercut::Agent do
       @agent.instance_eval { @called_hi }.should_not == true
       @agent.instance_eval { @called_hi_regex }.should == true
     end
+    
+    it "allows single argument for string pattern" do
+      msg = Jabber::Message.new(nil)
+      msg.body = 'hello'
+      msg.from = Jabber::JID.fake_jid
+      
+      @agent.send(:dispatch, msg)
+      @agent.instance_eval { @called_hello }.should == true
+    end
   end
   
   describe :multiple_instances do
