@@ -12,7 +12,7 @@ class Uppercut
       #
       # There is always at least one argument sent to the block.  The first
       # is a always an Uppercut::Message object, which can be used to reply
-      # to the sender.  The rest of the arguments to the block correspond to
+      # to the sender. The rest of the arguments to the block correspond to
       # any captures in the pattern Regexp. (Does not apply to String 
       # patterns).
       def command(pattern, &block)
@@ -34,11 +34,11 @@ class Uppercut
         callbacks[type] = block
       end
       
-      def commands
+      def commands #:nodoc:
         @commands ||= []
       end
       
-      def callbacks
+      def callbacks #:nodoc:
         @callbacks ||= {}
       end
     end
@@ -63,7 +63,7 @@ class Uppercut
       @redirects = {}
     end
     
-    
+
     def inspect #:nodoc:
       "<Uppercut::Agent #{@user} " +
       "#{listening? ? 'Listening' : 'Not Listening'}:" +
