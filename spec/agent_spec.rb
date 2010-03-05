@@ -276,12 +276,12 @@ describe Uppercut::Agent do
     end
   end
   
-  describe :command do
+  describe :multiple do
     before do
       @french_agent = FrenchTestAgent.new('test@foo.com', 'pw', :connect => false)
     end
     
-    it "should allow multiple agents with different commands" do
+    it "should allow separat commands" do
       msg = Jabber::Message.new(nil)
       msg.body = 'hi'
       msg.from = Jabber::JID.fake_jid
@@ -294,6 +294,19 @@ describe Uppercut::Agent do
       @french_agent.send(:dispatch, msg)
       @french_agent.instance_eval { @called_hi }.should_not == true
       @french_agent.instance_eval { @called_salut }.should == true
+    end
+    
+    it "should allow separat callbacks" do
+      @agent.listen
+
+      presence = Jabber::Presence.new(nil, nil)
+      @french_agent.send(:dispatch_presence, :subscribe, presence)
+      @french_agent.instance_eval { @last_callback }.should == nil
+      @agent.instance_eval { @last_callback }.should == nil
+      
+      @agent.send(:dispatch_presence, :subscribe, presence)
+      @french_agent.instance_eval { @last_callback }.should == nil
+      @agent.instance_eval { @last_callback }.should == :subscribe
     end
   end
 end
