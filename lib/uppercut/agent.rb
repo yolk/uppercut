@@ -16,10 +16,7 @@ class Uppercut
       # any captures in the pattern Regexp. (Does not apply to String 
       # patterns).
       def command(pattern, &block)
-        @patterns ||= []
-        g = gensym
-        commands << [pattern, g]
-        define_method(g, &block)
+        commands << [pattern, block]
       end
 
       # Define a callback for specific presence events.
@@ -33,17 +30,15 @@ class Uppercut
       #
       def on(type, &block)
         raise 'Not a valid callback' unless VALID_CALLBACKS.include?(type)
-        define_method("__on_#{type.to_s}", &block)
+        callbacks[type] = block
       end
       
       def commands
         @commands ||= []
       end
-
-      private
-
-      def gensym
-        ('__uc' + (self.instance_methods.grep(/^__uc/).size).to_s.rjust(8, '0')).intern
+      
+      def callbacks
+        @callbacks ||= {}
       end
     end
 
@@ -187,16 +182,16 @@ class Uppercut
       return block[msg.body] if block
 
       captures = nil
-      pair = self.class.commands.detect { |pattern, method| captures = matches?(pattern, msg.body) }
+      pair = self.class.commands.detect { |pattern, block| captures = matches?(pattern, msg.body) }
       if pair
-        pattern, method = pair
-        send method, Conversation.new(msg.from, self), captures
+        pattern, block = pair
+        block.call(Conversation.new(msg.from, self), captures)
       end
     end
 
     def dispatch_presence(type, presence)
-      handler = "__on_#{type}"
-      self.send(handler, Conversation.new(presence.from, self), presence) if respond_to?(handler)
+      return unless self.class.callbacks[type]
+      self.class.callbacks[type].call(Conversation.new(presence.from, self), presence)
     end
 
     def __ucDefault(msg)
