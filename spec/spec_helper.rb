@@ -22,20 +22,6 @@ class TestAgent < Uppercut::Agent
     c.send 'called high regex'
   end
   
-  command /(good)?bye/ do |c, args|
-    @called_goodbye = true
-    c.send args.first ? "Good bye to you as well!" : "Rot!"
-  end
-  
-  command 'wait' do |c, args|
-    @called_wait = true
-    c.send 'Waiting...'
-    c.wait_for do |reply|
-      @called_wait_block = true
-      c.send 'Hooray!'
-    end
-  end
-  
   command 'hello' do |c|
     c.instance_eval { @base.instance_eval { @called_hello = true } }
     c.send 'called hello'
