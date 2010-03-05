@@ -128,37 +128,36 @@ describe Uppercut::Agent do
     describe 'presence callbacks' do
       it 'processes :signon presence callback' do
         @agent.listen
-        @agent.should_receive :__on_signon
         new_presence = Jabber::Presence.new(nil, nil)
         old_presence = Jabber::Presence.new(nil, nil)
         old_presence.type = :unavailable
-
+        
         @agent.roster.receive_presence(Jabber::Roster::Helper::RosterItem.new, old_presence, new_presence)
+        @agent.instance_eval { @last_callback }.should == :signon
       end
 
       it 'processes :signoff presence callback' do
         @agent.listen
-        @agent.should_receive :__on_signoff
         presence = Jabber::Presence.new(nil, nil)
         presence.type = :unavailable
 
         @agent.roster.receive_presence(Jabber::Roster::Helper::RosterItem.new, nil, presence)
+        @agent.instance_eval { @last_callback }.should == :signoff
       end
 
       it 'processes :status_change presence callback' do
         @agent.listen
-        @agent.should_receive :__on_status_change
 
         old_presence = Jabber::Presence.new(nil, nil)
         new_presence = Jabber::Presence.new(nil, nil)
         new_presence.show = :away
 
         @agent.roster.receive_presence(Jabber::Roster::Helper::RosterItem.new, old_presence, new_presence)
+        @agent.instance_eval { @last_callback }.should == :status_change
       end
 
       it 'processes :status_message_change presence callback' do
         @agent.listen
-        @agent.should_receive :__on_status_message_change
 
         old_presence = Jabber::Presence.new(nil, nil)
         old_presence.status = 'chicka chicka yeaaaaah'
@@ -167,11 +166,11 @@ describe Uppercut::Agent do
         new_presence.status = 'thom yorke is the man'
 
         @agent.roster.receive_presence(Jabber::Roster::Helper::RosterItem.new, old_presence, new_presence)
+        @agent.instance_eval { @last_callback }.should == :status_message_change
       end
 
       it 'processes :subscribe presence callback' do
         @agent.listen
-        @agent.should_receive :__on_subscribe
         @agent.roster.should_receive :add
         @agent.roster.should_receive :accept_subscription
 
@@ -179,21 +178,21 @@ describe Uppercut::Agent do
         presence.type = :subscribe
 
         @agent.roster.receive_subscription_request(Jabber::Roster::Helper::RosterItem.new, presence)
+        @agent.instance_eval { @last_callback }.should == :subscribe
       end
 
       it 'processes :subscription_approval presence callback' do
         @agent.listen
-        @agent.should_receive :__on_subscription_approval
 
         presence = Jabber::Presence.new(nil, nil)
         presence.type = :subscribed
 
         @agent.roster.receive_subscription(Jabber::Roster::Helper::RosterItem.new, presence)
+        @agent.instance_eval { @last_callback }.should == :subscription_approval
       end
 
       it 'processes :subscription_denial presence callback' do
         @agent.listen
-        @agent.should_receive :__on_subscription_denial
 
         presence = Jabber::Presence.new(nil, nil)
         presence.type = :unsubscribed
@@ -202,16 +201,17 @@ describe Uppercut::Agent do
         item.subscription = :from
 
         @agent.roster.receive_subscription(item, presence)
+        @agent.instance_eval { @last_callback }.should == :subscription_denial
       end
 
       it 'processes :unsubscribe presence callback' do
         @agent.listen
-        @agent.should_receive :__on_unsubscribe
 
         presence = Jabber::Presence.new(nil, nil)
         presence.type = :unsubscribe
 
         @agent.roster.receive_subscription(Jabber::Roster::Helper::RosterItem.new, presence)
+        @agent.instance_eval { @last_callback }.should == :unsubscribe
       end
     end
   end
@@ -247,10 +247,10 @@ describe Uppercut::Agent do
   describe :dispatch_presence do
     it 'calls the correct callback' do
       @agent.listen
-      @agent.should_receive(:__on_subscribe)
 
       presence = Jabber::Presence.new(nil, nil)
       @agent.send(:dispatch_presence, :subscribe, presence)
+      @agent.instance_eval { @last_callback }.should == :subscribe
     end
   end
   

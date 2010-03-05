@@ -33,7 +33,7 @@ class Uppercut
       #
       def on(type, &block)
         raise 'Not a valid callback' unless VALID_CALLBACKS.include?(type)
-        define_method("__on_#{type.to_s}") { |conversation| block[conversation] }
+        define_method("__on_#{type.to_s}", &block)
       end
       
       def commands

@@ -42,7 +42,9 @@ class TestAgent < Uppercut::Agent
   end
 
   Uppercut::Agent::VALID_CALLBACKS.each do |cb|
-    on(cb) { }
+    on(cb) do |c, presence|
+      c.instance_eval { @base.instance_eval { @last_callback = cb.to_sym } }
+    end
   end
 end
 
