@@ -19,12 +19,17 @@ class TestAgent < Uppercut::Agent
   
   command /^hi/ do |c, args|
     c.instance_eval { @base.instance_eval { @called_hi_regex = true } }
-    c.send 'called high regex'
+    c.send 'called hi regex'
   end
   
   command 'hello' do |c|
     c.instance_eval { @base.instance_eval { @called_hello = true } }
     c.send 'called hello'
+  end
+  
+  command /^hello i am (.*), your (.*)/ do |c, name, relation|
+    c.instance_eval { @base.instance_eval { @called_hello_regex = "#{name} is a my #{relation}" } }
+    c.send 'called hello regex'
   end
 
   Uppercut::Agent::VALID_CALLBACKS.each do |cb|

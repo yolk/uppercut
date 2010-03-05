@@ -296,6 +296,15 @@ describe Uppercut::Agent do
       @agent.send(:dispatch, msg)
       @agent.instance_eval { @called_hello }.should == true
     end
+    
+    it "allows multiple arguments for matches of regular expression pattern" do
+      msg = Jabber::Message.new(nil)
+      msg.body = 'hello i am julia, your grandmother'
+      msg.from = Jabber::JID.fake_jid
+      
+      @agent.send(:dispatch, msg)
+      @agent.instance_eval { @called_hello_regex }.should == "julia is a my grandmother"
+    end
   end
   
   describe :multiple_instances do
