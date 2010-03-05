@@ -16,6 +16,7 @@ class Uppercut
       # any captures in the pattern Regexp. (Does not apply to String 
       # patterns).
       def command(pattern, &block)
+        commands.delete_if{|command| command[0] == pattern }
         commands << [pattern, block]
       end
 
