@@ -305,6 +305,15 @@ describe Uppercut::Agent do
       @agent.send(:dispatch, msg)
       @agent.instance_eval { @called_hello_regex }.should == "julia is a my grandmother"
     end
+  
+    it "allows no argument for string pattern (and eval inside of agent instance)" do
+      msg = Jabber::Message.new(nil)
+      msg.body = 'salve'
+      msg.from = Jabber::JID.fake_jid
+      
+      @agent.send(:dispatch, msg)
+      @agent.instance_eval { @called_salve }.should == true
+    end
   end
   
   describe :multiple_instances do

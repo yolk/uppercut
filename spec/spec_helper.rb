@@ -37,6 +37,11 @@ class TestAgent < Uppercut::Agent
       c.instance_eval { @base.instance_eval { @last_callback = cb.to_sym } }
     end
   end
+  
+  command 'salve' do
+    instance_eval { @base.instance_eval { @called_salve = true } }
+    send 'called salve'
+  end
 end
 
 class FrenchTestAgent < Uppercut::Agent
