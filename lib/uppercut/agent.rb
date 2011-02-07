@@ -82,78 +82,80 @@ class Uppercut
     # the message to the proper handler.
     def listen
       connect unless connected?
+      
+      @roster ||= Jabber::Roster::Helper.new(@client)
+      @client.add_message_callback do |message|
+        log_and_continue do
+          next if message.body.nil?
+          next unless allowed_roster_includes?(message.from)
+          dispatch message
+        end
+      end
 
-      @listen_thread = Thread.new {
-        @client.add_message_callback do |message|
-          log_and_continue do
-            next if message.body.nil?
-            next unless allowed_roster_includes?(message.from)
-            dispatch message
+      @roster.add_presence_callback do |item, old_presence, new_presence|
+        # Callbacks:
+        # post-subscribe initial stuff (oldp == nil)
+        # status change: (oldp.show != newp.show)
+        # status message change: (oldp.status != newp.status)
+
+        log_and_continue do
+          if old_presence.nil? && new_presence.type == :unavailable
+            dispatch_presence :signoff, new_presence
+          elsif old_presence.nil?
+            # do nothing, we don't care
+          elsif old_presence.type == :unavailable && new_presence
+            dispatch_presence :signon, new_presence
+          elsif old_presence.show != new_presence.show
+            dispatch_presence :status_change, new_presence
+          elsif old_presence.status != new_presence.status
+            dispatch_presence :status_message_change, new_presence
           end
         end
+      end
+      @roster.add_subscription_request_callback do |item, presence|
+        # Callbacks:
+        # someone tries to subscribe (presence.type == 'subscribe')
 
-        @roster ||= Jabber::Roster::Helper.new(@client)
-        @roster.add_presence_callback do |item, old_presence, new_presence|
-          # Callbacks:
-          # post-subscribe initial stuff (oldp == nil)
-          # status change: (oldp.show != newp.show)
-          # status message change: (oldp.status != newp.status)
-
-          log_and_continue do
-            if old_presence.nil? && new_presence.type == :unavailable
-              dispatch_presence :signoff, new_presence
-            elsif old_presence.nil?
-              # do nothing, we don't care
-            elsif old_presence.type == :unavailable && new_presence
-              dispatch_presence :signon, new_presence
-            elsif old_presence.show != new_presence.show
-              dispatch_presence :status_change, new_presence
-            elsif old_presence.status != new_presence.status
-              dispatch_presence :status_message_change, new_presence
-            end
+        log_and_continue do
+          case presence.type
+          when :subscribe
+            next unless allowed_roster_includes?(presence.from)
+            @roster.accept_subscription(presence.from)
+            @roster.add(presence.from, nil, true)
+            dispatch_presence :subscribe, presence
           end
         end
-        @roster.add_subscription_request_callback do |item, presence|
-          # Callbacks:
-          # someone tries to subscribe (presence.type == 'subscribe')
+      end
+      @roster.add_subscription_callback do |item, presence|
+        # Callbacks:
+        # user allows agent to subscribe to them (presence.type == 'subscribed')
+        # user denies agent subscribe request (presence.type == 'unsubscribed')
+        # user unsubscribes from agent (presence.type == 'unsubscribe')
 
-          log_and_continue do
-            case presence.type
-            when :subscribe
-              next unless allowed_roster_includes?(presence.from)
-              @roster.accept_subscription(presence.from)
-              @roster.add(presence.from, nil, true)
-              dispatch_presence :subscribe, presence
-            end
+        log_and_continue do
+          case presence.type
+          when :subscribed
+            dispatch_presence :subscription_approval, presence
+          when :unsubscribed
+            # if item.subscription != :from, it's not a denial... it's just an unsub
+            dispatch_presence(:subscription_denial, presence) if item.subscription == :from
+          when :unsubscribe
+            dispatch_presence :unsubscribe, presence
           end
         end
-        @roster.add_subscription_callback do |item, presence|
-          # Callbacks:
-          # user allows agent to subscribe to them (presence.type == 'subscribed')
-          # user denies agent subscribe request (presence.type == 'unsubscribed')
-          # user unsubscribes from agent (presence.type == 'unsubscribe')
-
-          log_and_continue do
-            case presence.type
-            when :subscribed
-              dispatch_presence :subscription_approval, presence
-            when :unsubscribed
-              # if item.subscription != :from, it's not a denial... it's just an unsub
-              dispatch_presence(:subscription_denial, presence) if item.subscription == :from
-            when :unsubscribe
-              dispatch_presence :unsubscribe, presence
-            end
-          end
-        end
-        sleep
-      }
+      end
+      @listen_thread = Thread.new { sleep }
+      
     end
 
     # Stops the Agent from listening to incoming messages.
     #
     # Simply kills the thread if it is running.
     def stop
-      @listen_thread.kill if listening?
+      if listening?
+        @listen_thread.exit
+        sleep(0.01)
+      end
     end
 
     # True if the Agent is currently listening for incoming messages.

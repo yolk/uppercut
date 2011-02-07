@@ -2,7 +2,6 @@ require "rake"
 require "rake/clean"
 require "rake/gempackagetask"
 require "rake/rdoctask"
-require "spec/rake/spectask"
 require "fileutils"
 
 require File.dirname(__FILE__) + "/lib/uppercut"
@@ -45,7 +44,9 @@ namespace :doc do
 end
 
 
-desc "Run all specs"
-Spec::Rake::SpecTask.new('spec') do |t|
-  t.spec_files = FileList['spec/*_spec.rb']
-end
+require 'rspec/core/rake_task'
+
+RSpec::Core::RakeTask.new(:spec)
+
+task :default => :spec
+

@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'spec'
+require 'rspec'
 require 'set'
 
 $: << File.dirname(__FILE__)
